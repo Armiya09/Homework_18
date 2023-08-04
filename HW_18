@@ -1,0 +1,124 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+
+// Класс пользователя
+class User {
+public:
+  User(std::string name, std::string login, std::string pass) : name_(name), login_(login), pass_(pass) {}
+
+  std::string name() const { return name_; }
+  std::string login() const { return login_; }
+  std::string pass() const { return pass_; }
+
+private:
+  std::string name_;
+  std::string login_;
+  std::string pass_;
+};
+
+// Класс сообщения
+class Message {
+public:
+  Message(std::string text, std::string sender, std::string receiver) : text_(text), sender_(sender), receiver_(receiver) {}
+
+  std::string text() const { return text_; }
+  std::string sender() const { return sender_; }
+  std::string receiver() const { return receiver_; }
+
+private:
+  std::string text_;
+  std::string sender_;
+  std::string receiver_;
+};
+
+
+std::vector<User> read_users(std::string filename) {
+  std::vector<User> users;
+  std::ifstream file(filename);
+  if (!file.is_open()) {
+    std::cerr << "Ошибка открытия файла " << filename << std::endl;
+    return users;
+  }
+
+  std::string name, login, pass;
+  while (file >> name >> login >> pass) {
+    users.emplace_back(name, login, pass);
+  }
+
+  file.close();
+  return users;
+}
+
+
+std::vector<Message> read_messages(std::string filename) {
+  std::vector<Message> messages;
+  std::ifstream file(filename);
+  if (!file.is_open()) {
+    std::cerr << "Ошибка открытия файла " << filename << std::endl;
+    return messages;
+  }
+
+  std::string text, sender, receiver;
+  while (file >> text >> sender >> receiver) {
+    messages.emplace_back(text, sender, receiver);
+  }
+
+  file.close();
+  return messages;
+}
+
+
+void write_users(std::string filename, const std::vector<User>& users) {
+  std::ofstream file(filename);
+  if (!file.is_open()) {
+    std::cerr << "Ошибка открытия файла " << filename << std::endl;
+    return;
+  }
+
+  for (const auto& user : users) {
+    file << user.name() << " " << user.login() << " " << user.pass() << std::endl;
+  }
+
+  file.close();
+}
+
+
+void write_messages(std::string filename, const std::vector<Message>& messages) {
+  std::ofstream file(filename);
+  if (!file.is_open()) {
+    std::cerr << "Ошибка открытия файла " << filename << std::endl;
+    return;
+  }
+
+  for (const auto& message : messages) {
+    file << message.text() << " " << message.sender() << " " << message.receiver() << std::endl;
+  }
+
+  file.close();
+}
+
+int main() {
+ 
+  std::vector<User> users = read_users("users.txt");
+  std::cout << "Прочитали " << users.size() << " пользователей из файла" << std::endl;
+
+  
+  std::vector<Message> messages = read_messages("messages.txt");
+  std::cout << "Прочитали " << messages.size() << " сообщений из файла" << std::endl;
+
+
+  users.emplace_back("Новый пользователь", "newuser", "password");
+  messages.emplace_back("Новое сообщение", "sender", "receiver");
+
+
+  write_users("users.txt", users);
+  std::cout << "Записали " << users.size() << " пользователей в файл" << std::endl;
+
+
+  write_messages("messages.txt", messages);
+  std::cout << "Записали " << messages.size() << " сообщений в файл" << std::endl;
+
+  return 0;
+}
